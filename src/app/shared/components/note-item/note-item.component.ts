@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject, computed } from '@angular/core';
 import type { Note } from '../../../core/supabase/database.types';
+import { BooksStateService } from '../../../books/books-state.service';
 
 @Component({
   selector: 'app-note-item',
@@ -14,6 +15,15 @@ export class NoteItemComponent {
   readonly metaDate = input.required<string>();
   readonly canDelete = input(false);
   readonly testId = input('');
+  readonly showBook = input(false);
+
+  private readonly booksState = inject(BooksStateService);
+
+  protected readonly bookTitle = computed(() => {
+    if (!this.showBook()) return '';
+    const bookId = this.note().book_id;
+    return this.booksState.getBookById(bookId)?.title ?? '';
+  });
 
   readonly noteClick = output<Note>();
   readonly deleteClick = output<{ note: Note; event: MouseEvent }>();

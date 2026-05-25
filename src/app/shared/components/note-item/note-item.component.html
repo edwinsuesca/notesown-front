@@ -11,6 +11,11 @@
     >
       {{ note().title || 'Sin título' }}
     </p>
+    @if (showBook() && bookTitle()) {
+      <span class="text-[0.7rem] text-[var(--p-text-muted-color)] mt-0.5 block leading-none font-medium uppercase tracking-wide">
+        {{ bookTitle() }}
+      </span>
+    }
     <p class="text-[0.8rem] text-[var(--p-text-muted-color)] m-0 line-clamp-2">
       {{ stripHtml(note().content) || 'Sin contenido' }}
     </p>

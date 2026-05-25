@@ -30,16 +30,10 @@ export class DashboardComponent implements OnInit {
 
   protected readonly isLoadingStats = signal(true);
   protected readonly totalNotes = signal(0);
-  protected readonly recentRead = signal<Note[]>([]);
-  protected readonly recentModified = signal<Note[]>([]);
+  protected readonly recentNotes = signal<Note[]>([]);
+  protected readonly modifiedTodayCount = signal(0);
 
   protected readonly booksCount = computed(() => this.booksState.books().length);
-
-  protected readonly modifiedTodayCount = computed(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return this.recentModified().filter(n => new Date(n.updated_at) >= today).length;
-  });
 
   protected readonly userFirstName = computed(() => {
     const email = this.auth.currentUser()?.email ?? '';
@@ -55,15 +49,45 @@ export class DashboardComponent implements OnInit {
     try {
       const [total, read, modified] = await Promise.all([
         this.notesRepo.countAll(),
-        this.notesRepo.getRecentlyRead(5),
-        this.notesRepo.getRecentlyModified(5),
+        this.notesRepo.getRecentlyRead(10),
+        this.notesRepo.getRecentlyModified(10),
       ]);
       this.totalNotes.set(total);
-      this.recentRead.set(read);
-      this.recentModified.set(modified);
+
+      // Calcular modificadas hoy a partir del listado completo
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayCount = modified.filter(n => new Date(n.updated_at) >= today).length;
+      this.modifiedTodayCount.set(todayCount);
+
+      // Obtener recencia máxima: max(last_read_at, updated_at)
+      const getRecentTime = (n: Note) => Math.max(
+        new Date(n.last_read_at || 0).getTime(),
+        new Date(n.updated_at).getTime()
+      );
+
+      // Combinar listas y remover duplicados
+      const seen = new Set<string>();
+      const combined = [...read, ...modified].filter(n => {
+        if (seen.has(n.id)) return false;
+        seen.add(n.id);
+        return true;
+      });
+
+      // Ordenar por fecha de recencia descendente
+      combined.sort((a, b) => getRecentTime(b) - getRecentTime(a));
+
+      // Asignar el top 5
+      this.recentNotes.set(combined.slice(0, 5));
     } finally {
       this.isLoadingStats.set(false);
     }
+  }
+
+  protected getRecentDate(note: Note): string {
+    const readTime = new Date(note.last_read_at || 0).getTime();
+    const modTime = new Date(note.updated_at).getTime();
+    return readTime > modTime ? (note.last_read_at || note.updated_at) : note.updated_at;
   }
 
   protected openNote(note: Note): void {
