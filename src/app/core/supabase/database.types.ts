@@ -3,6 +3,7 @@ export interface Book {
   user_id: string;
   title: string;
   icon: string;
+  order: number;
   created_at: string;
   updated_at: string;
 }

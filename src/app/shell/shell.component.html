@@ -76,59 +76,69 @@
       } @else if (books().length === 0) {
         <p class="sidebar__empty-hint">Crea tu primer libro</p>
       } @else {
-        @for (book of books(); track book.id) {
-          <div
-            class="sidebar__book-item"
-            [class.sidebar__book-item--active]="isBookActive(book.id)"
-          >
-            <a
-              [routerLink]="['/app', book.id]"
-              class="sidebar__book-link"
-              [attr.data-testid]="'book-' + book.id"
+        <div
+          cdkDropList
+          [cdkDropListData]="books()"
+          (cdkDropListDropped)="onBookDropped($event)"
+          class="sidebar__books-list"
+        >
+          @for (book of books(); track book.id) {
+            <div
+              class="sidebar__book-item"
+              [class.sidebar__book-item--active]="isBookActive(book.id)"
+              cdkDrag
+              [cdkDragData]="book"
             >
-              <i [class]="book.icon"></i>
-              <span>{{ book.title }}</span>
-            </a>
-            <div class="sidebar__book-actions sidebar__book-actions--desktop">
-              <p-button
-                icon="pi pi-pencil"
-                [text]="true"
-                severity="secondary"
-                size="small"
-                ariaLabel="Renombrar libro"
-                pTooltip="Renombrar"
-                tooltipPosition="right"
-                (onClick)="openRenameBookDialog(book)"
-              />
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                severity="danger"
-                size="small"
-                ariaLabel="Eliminar libro"
-                pTooltip="Eliminar"
-                tooltipPosition="right"
-                (onClick)="confirmDeleteBook(book, $event)"
-              />
-            </div>
-            <div class="sidebar__book-actions--mobile">
-              <p-menu
-                #bookContextMenu
-                [model]="bookMenuItems()"
-                [popup]="true"
-                (onBlur)="bookContextMenu.hide()"
-              />
-              <button
-                class="sidebar__book-menu-btn"
-                type="button"
-                aria-label="Opciones del libro"
-                (click)="openBookMenu(book, $event, bookContextMenu)"
+              <div class="sidebar__book-placeholder" *cdkDragPlaceholder></div>
+              <a
+                [routerLink]="['/app', book.id]"
+                class="sidebar__book-link"
+                [attr.data-testid]="'book-' + book.id"
               >
-                <i class="pi pi-ellipsis-v"></i>
-              </button>
+                <i [class]="book.icon"></i>
+                <span>{{ book.title }}</span>
+              </a>
+              <div class="sidebar__book-actions sidebar__book-actions--desktop">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  ariaLabel="Renombrar libro"
+                  pTooltip="Renombrar"
+                  tooltipPosition="right"
+                  (onClick)="openRenameBookDialog(book)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  ariaLabel="Eliminar libro"
+                  pTooltip="Eliminar"
+                  tooltipPosition="right"
+                  (onClick)="confirmDeleteBook(book, $event)"
+                />
+              </div>
+              <div class="sidebar__book-actions--mobile">
+                <p-menu
+                  #bookContextMenu
+                  [model]="bookMenuItems()"
+                  [popup]="true"
+                  (onBlur)="bookContextMenu.hide()"
+                />
+                <button
+                  class="sidebar__book-menu-btn"
+                  type="button"
+                  aria-label="Opciones del libro"
+                  (click)="openBookMenu(book, $event, bookContextMenu)"
+                >
+                  <i class="pi pi-ellipsis-v"></i>
+                </button>
+              </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       }
     </div>
   </div>

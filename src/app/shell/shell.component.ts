@@ -37,6 +37,8 @@ import { PrivBookService, PRIV_BOOK_TITLE } from '../core/private/priv-book.serv
 import { ShellActionsService } from '../core/shell-actions/shell-actions.service';
 import type { Book, Note } from '../core/supabase/database.types';
 
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 const SECONDARY_ROUTES = ['search', 'recent-read', 'recent-modified', 'settings'];
 
 @Component({
@@ -49,6 +51,7 @@ const SECONDARY_ROUTES = ['search', 'recent-read', 'recent-modified', 'settings'
     BreadcrumbModule, TieredMenuModule, MenuModule,
     InputTextModule, ConfirmDialogModule, ToastModule, SelectModule,
     FormsModule, ThemeToggleComponent, NoteEditorComponent, NoteItemComponent, EmptyStateComponent,
+    DragDropModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './shell.component.html',
@@ -503,6 +506,32 @@ export class ShellComponent {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear la nota' });
     } finally {
       this.isSavingNewNote.set(false);
+    }
+  }
+
+  protected async onBookDropped(event: CdkDragDrop<Book[]>): Promise<void> {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const booksList = [...this.books()];
+    moveItemInArray(booksList, event.previousIndex, event.currentIndex);
+
+    const updatedBooks = booksList.map((book, idx) => ({
+      ...book,
+      order: idx,
+    }));
+
+    this.booksState.setBooks(updatedBooks);
+
+    try {
+      const updatePromises = updatedBooks.map(book =>
+        this.booksRepo.update(book.id, { order: book.order })
+      );
+      await Promise.all(updatePromises);
+      this.messageService.add({ severity: 'success', summary: 'Orden actualizado', detail: 'El orden de los libros se guardó con éxito' });
+    } catch {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el nuevo orden de los libros' });
+      const originalBooks = await this.booksRepo.getAll();
+      this.booksState.setBooks(originalBooks);
     }
   }
 

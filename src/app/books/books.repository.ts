@@ -11,7 +11,8 @@ export class BooksRepository {
       .from('books')
       .select('*')
       .neq('title', '__priv__')
-      .order('created_at', { ascending: true });
+      .order('order', { ascending: true })
+      .order('created_at', { ascending: false });
     if (error) throw error;
     return data;
   }
@@ -28,14 +29,14 @@ export class BooksRepository {
   async create(title: string, icon = 'pi pi-book'): Promise<Book> {
     const { data, error } = await this.db
       .from('books')
-      .insert({ title, icon })
+      .insert({ title, icon, order: 0 })
       .select()
       .single();
     if (error) throw error;
     return data;
   }
 
-  async update(id: string, changes: Partial<Pick<Book, 'title' | 'icon'>>): Promise<Book> {
+  async update(id: string, changes: Partial<Pick<Book, 'title' | 'icon' | 'order'>>): Promise<Book> {
     const { data, error } = await this.db
       .from('books')
       .update(changes)

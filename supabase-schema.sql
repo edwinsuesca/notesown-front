@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS public.books (
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title      TEXT NOT NULL CHECK (char_length(title) > 0 AND char_length(title) <= 100),
   icon       TEXT NOT NULL DEFAULT 'pi pi-book',
+  "order"    INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS public.user_keys (
 -- ÍNDICES
 -- -----------------------------------------------
 CREATE INDEX IF NOT EXISTS books_user_id_idx ON public.books(user_id);
+CREATE INDEX IF NOT EXISTS books_order_created_at_idx ON public.books("order" ASC, created_at DESC);
 CREATE INDEX IF NOT EXISTS notes_book_id_idx ON public.notes(book_id);
 CREATE INDEX IF NOT EXISTS notes_user_id_idx ON public.notes(user_id);
 CREATE INDEX IF NOT EXISTS notes_updated_at_idx ON public.notes(user_id, updated_at DESC);
