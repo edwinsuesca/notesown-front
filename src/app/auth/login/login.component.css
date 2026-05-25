@@ -1,0 +1,10 @@
+/* 
+ * Migration note: Most styles moved to Tailwind classes in login.component.html
+ * Remaining CSS that cannot be migrated to Tailwind:
+ * (no additional CSS needed - all styles were migratable)
+ */
+
+:host {
+  display: block;
+  position: relative;
+}

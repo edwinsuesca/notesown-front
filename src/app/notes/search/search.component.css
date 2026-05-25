@@ -1,0 +1,104 @@
+:host {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.search-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--p-surface-card);
+}
+
+.search-view__header {
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--p-content-border-color);
+  background: var(--p-surface-card);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.search-view__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--p-text-color);
+}
+
+.search-view__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-view__icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--p-text-muted-color);
+  pointer-events: none;
+}
+
+.search-view__input {
+  width: 100%;
+  padding-left: 2.25rem !important;
+}
+
+.search-view__results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.search-view__count {
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+  margin: 0 0 0.5rem;
+}
+
+.result-skeleton {
+  padding: 1rem;
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-skeleton__title,
+.result-skeleton__preview,
+.result-skeleton__meta {
+  border-radius: 4px;
+  background: var(--p-content-border-color);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.result-skeleton__title { height: 14px; width: 60%; }
+.result-skeleton__preview { height: 12px; width: 90%; }
+.result-skeleton__meta { height: 10px; width: 35%; }
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.search-view__priv-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--nw-accent-text);
+  background: var(--nw-accent-subtle-bg);
+  border: 1px solid var(--nw-accent-subtle-border);
+  border-radius: var(--nw-radius-md);
+  padding: 0.5rem 0.75rem;
+}

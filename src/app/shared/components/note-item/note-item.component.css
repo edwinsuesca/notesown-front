@@ -1,0 +1,10 @@
+/* 
+ * Migration note: Most styles moved to Tailwind classes in note-item.component.html
+ * Remaining CSS that cannot be migrated to Tailwind:
+ */
+
+:host {
+  display: contents;
+}
+
+/* Note: El padding-left del input search en shell está en ::ng-deep */

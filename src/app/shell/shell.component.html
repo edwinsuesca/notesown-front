@@ -1,0 +1,465 @@
+<p-toast position="top-right" />
+<p-confirmdialog />
+
+<!-- SIDEBAR CONTENT TEMPLATE (shared between desktop nav and mobile drawer) -->
+<ng-template #sidebarContent>
+  <div class="sidebar__top">
+    <div class="flex items-center gap-2 pt-4 pb-3.5 px-3 shrink-0">
+      <img src="/notesown-icon.svg" alt="" class="w-6 h-6 shrink-0" aria-hidden="true" />
+      <span class="text-base font-bold text-[var(--nw-brand-color)] tracking-tight">Notesown</span>
+    </div>
+
+    <div class="sidebar__section">
+      <a
+        routerLink="/app"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        data-testid="nav-home"
+      >
+        <i class="pi pi-home"></i>
+        <span>Inicio</span>
+      </a>
+      <a
+        routerLink="/app/search"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        data-testid="nav-search"
+      >
+        <i class="pi pi-search"></i>
+        <span>Buscar</span>
+      </a>
+      <a
+        routerLink="/app/recent-read"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        data-testid="nav-recent-read"
+      >
+        <i class="pi pi-clock"></i>
+        <span>Recientes leídos</span>
+      </a>
+      <a
+        routerLink="/app/recent-modified"
+        routerLinkActive="sidebar__nav-item--active"
+        class="sidebar__nav-item"
+        data-testid="nav-recent-modified"
+      >
+        <i class="pi pi-history"></i>
+        <span>Recientes modificados</span>
+      </a>
+    </div>
+
+    <p-divider />
+
+    <div class="sidebar__section">
+      <div class="sidebar__section-header">
+        <p class="sidebar__section-title">Libros</p>
+        <p-button
+          icon="pi pi-plus"
+          [text]="true"
+          severity="secondary"
+          size="small"
+          ariaLabel="Crear nuevo libro"
+          pTooltip="Nuevo libro"
+          tooltipPosition="right"
+          (onClick)="openCreateBookDialog()"
+          data-testid="btn-new-book"
+        />
+      </div>
+
+      @if (isLoadingBooks()) {
+        <div class="sidebar__skeleton-list">
+          @for (item of [1, 2, 3]; track item) {
+            <div class="sidebar__skeleton-item"></div>
+          }
+        </div>
+      } @else if (books().length === 0) {
+        <p class="sidebar__empty-hint">Crea tu primer libro</p>
+      } @else {
+        @for (book of books(); track book.id) {
+          <div
+            class="sidebar__book-item"
+            [class.sidebar__book-item--active]="isBookActive(book.id)"
+          >
+            <a
+              [routerLink]="['/app', book.id]"
+              class="sidebar__book-link"
+              [attr.data-testid]="'book-' + book.id"
+            >
+              <i [class]="book.icon"></i>
+              <span>{{ book.title }}</span>
+            </a>
+            <div class="sidebar__book-actions sidebar__book-actions--desktop">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                ariaLabel="Renombrar libro"
+                pTooltip="Renombrar"
+                tooltipPosition="right"
+                (onClick)="openRenameBookDialog(book)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                ariaLabel="Eliminar libro"
+                pTooltip="Eliminar"
+                tooltipPosition="right"
+                (onClick)="confirmDeleteBook(book, $event)"
+              />
+            </div>
+            <div class="sidebar__book-actions--mobile">
+              <p-menu
+                #bookContextMenu
+                [model]="bookMenuItems()"
+                [popup]="true"
+                (onBlur)="bookContextMenu.hide()"
+              />
+              <button
+                class="sidebar__book-menu-btn"
+                type="button"
+                aria-label="Opciones del libro"
+                (click)="openBookMenu(book, $event, bookContextMenu)"
+              >
+                <i class="pi pi-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="sidebar__footer">
+    <app-theme-toggle />
+    <div class="sidebar__user">
+      <span class="sidebar__user-email" [title]="userEmail()">{{ userEmail() }}</span>
+      <a
+        routerLink="/app/settings"
+        class="sidebar__settings-btn"
+        ariaLabel="Ajustes"
+        pTooltip="Ajustes"
+        tooltipPosition="right"
+        data-testid="btn-settings"
+      >
+        <i class="pi pi-cog"></i>
+      </a>
+    </div>
+    <p-button
+      icon="pi pi-sign-out"
+      [text]="true"
+      severity="danger"
+      [rounded]="true"
+      ariaLabel="Cerrar sesión"
+      pTooltip="Cerrar sesión"
+      tooltipPosition="right"
+      (onClick)="signOut()"
+      data-testid="btn-logout"
+    />
+  </div>
+</ng-template>
+
+<div class="app-layout" [class.app-layout--dashboard]="isDashboardRoute()">
+  <!-- MOBILE TOPBAR -->
+  <div class="mobile-topbar">
+    <div class="mobile-topbar__brand">
+      <img src="/notesown-icon.svg" alt="" class="sidebar__brand-icon" aria-hidden="true" />
+      <span class="sidebar__brand-name">Notesown</span>
+    </div>
+    <p-button
+      icon="pi pi-bars"
+      [text]="true"
+      severity="secondary"
+      ariaLabel="Abrir menú"
+      (onClick)="drawerVisible.set(true)"
+      class="mobile-topbar__menu-btn"
+      data-testid="btn-open-drawer"
+    />
+  </div>
+
+  <!-- SIDEBAR DESKTOP -->
+  <nav class="sidebar" role="navigation" aria-label="Navegación principal">
+    <ng-container *ngTemplateOutlet="sidebarContent" />
+  </nav>
+
+  <!-- DRAWER MOBILE -->
+  <p-drawer
+    [(visible)]="drawerVisible"
+    position="left"
+    [showCloseIcon]="false"
+    styleClass="nw-sidebar-drawer"
+    [style]="{ width: '260px' }"
+  >
+    <ng-container *ngTemplateOutlet="sidebarContent" />
+  </p-drawer>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content" [class.main-content--note-open]="!!currentNoteId()">
+    <!-- COL 2: router-outlet (rutas secundarias) o panel de notas (rutas de libro) -->
+    <div class="panel-list" [class.panel-list--full]="isSettingsRoute() || isDashboardRoute()">
+      <!-- Router outlet: visible en rutas secundarias Y en dashboard -->
+      <div class="panel-list__outlet" [style.display]="showOutlet() ? '' : 'none'">
+        @if (isSecondaryRoute() && secondaryBreadcrumb().length) {
+          <div class="secondary-nav">
+            <p-breadcrumb
+              [model]="secondaryBreadcrumb()"
+              [home]="homeItem"
+              styleClass="secondary-nav__breadcrumb"
+            />
+          </div>
+        }
+        <router-outlet />
+      </div>
+
+      <!-- Panel de libro: rutas /app/:bookId -->
+      @if (!isSecondaryRoute() && !isDashboardRoute()) {
+        @if (!currentBookId()) {
+          <!-- Home: sin libro seleccionado -->
+          @if (responsive.isMobile()) {
+            <div class="books-home">
+              @if (isLoadingBooks()) {
+                @for (item of [1, 2, 3, 4]; track item) {
+                  <div class="books-home__skeleton"></div>
+                }
+              } @else if (books().length === 0) {
+                <app-empty-state icon="pi pi-book" message="Crea tu primer libro para ver notas" />
+              } @else {
+                @for (book of books(); track book.id) {
+                  <a [routerLink]="['/app', book.id]" class="books-home__item">
+                    <i [class]="book.icon" class="books-home__icon"></i>
+                    <span>{{ book.title }}</span>
+                  </a>
+                }
+              }
+            </div>
+          } @else {
+            <app-empty-state icon="pi pi-book" message="Selecciona un libro para ver notas" />
+          }
+        } @else if (bookNotFound()) {
+          <app-empty-state icon="pi pi-exclamation-circle" message="Libro no encontrado" />
+        } @else {
+          <!-- Lista de notas del libro activo -->
+          <aside class="notes-panel">
+            <div class="notes-panel__header">
+              <div class="notes-panel__header-breadcrumb">
+                @let bookTitle = currentBook()?.title || 'Notas';
+                <p-breadcrumb
+                  [model]="[{ label: bookTitle + ' (' + bookNotes().length + ')' }]"
+                  [home]="homeItem"
+                  styleClass="notes-panel__breadcrumb"
+                />
+              </div>
+              <p-button
+                icon="pi pi-plus"
+                ariaLabel="Nueva nota"
+                pTooltip="Nueva nota"
+                tooltipPosition="top"
+                [text]="true"
+                severity="secondary"
+                [loading]="isCreatingNote()"
+                (onClick)="createNote()"
+                data-testid="btn-new-note"
+              />
+            </div>
+            <div class="notes-panel__list">
+              @if (isLoadingNotes()) {
+                @for (item of [1, 2, 3]; track item) {
+                  <div class="note-skeleton">
+                    <div class="note-skeleton__title"></div>
+                    <div class="note-skeleton__preview"></div>
+                    <div class="note-skeleton__meta"></div>
+                  </div>
+                }
+              } @else if (bookNotes().length === 0) {
+                <div class="notes-panel__empty">
+                  <app-empty-state icon="pi pi-file" message="No hay notas en este libro" />
+                  <p-button
+                    label="Crear primera nota"
+                    [text]="true"
+                    (onClick)="createNote()"
+                    data-testid="btn-first-note"
+                  />
+                </div>
+              } @else {
+                @for (note of bookNotes(); track note.id) {
+                  <app-note-item
+                    [note]="note"
+                    [isActive]="editorState.selectedNote()?.id === note.id"
+                    [metaDate]="note.updated_at"
+                    [canDelete]="true"
+                    [testId]="'note-item-' + note.id"
+                    (noteClick)="selectNote($event)"
+                    (deleteClick)="confirmDeleteNote($event.note, $event.event)"
+                  />
+                }
+              }
+            </div>
+          </aside>
+        }
+      }
+    </div>
+
+    <!-- COL 3: editor -->
+    @if (showEditorPanel()) {
+      <div class="panel-editor">
+        <!-- Nav de editor: mobile y desktop cuando hay nota activa -->
+        @if (currentNoteId()) {
+          <div class="editor-nav">
+            <p-breadcrumb
+              [model]="breadcrumbItems()"
+              [home]="homeItem"
+              styleClass="editor-nav__breadcrumb"
+            />
+            <div>
+              <p-button
+                icon="pi pi-list"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                ariaLabel="Navegar entre notas"
+                pTooltip="Notas del libro"
+                (onClick)="toggleNotesMenu($event)"
+              />
+              <p-tieredmenu #notesMenu [model]="notesMenuItems()" [popup]="true" />
+            </div>
+          </div>
+        }
+        @if (noteNotFound()) {
+          <app-empty-state icon="pi pi-file-excel" message="Nota no encontrada" />
+        } @else {
+          <app-note-editor />
+        }
+      </div>
+    }
+  </main>
+</div>
+
+<!-- DIALOG: Crear Nota (desde dashboard) -->
+<p-dialog
+  [visible]="showCreateNoteDialog()"
+  (visibleChange)="showCreateNoteDialog.set($event)"
+  header="Nueva nota"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '26rem' }"
+  data-testid="create-note-dialog"
+>
+  <div class="book-dialog__content">
+    @if (booksState.books().length === 0) {
+      <p class="create-note-dialog__no-books">
+        <i class="pi pi-info-circle"></i>
+        Crea un libro primero para poder añadir notas.
+      </p>
+    } @else {
+      <div class="book-dialog__field">
+        <label for="newNoteBook" class="book-dialog__label">Libro</label>
+        <p-select
+          inputId="newNoteBook"
+          [options]="booksState.books()"
+          optionLabel="title"
+          optionValue="id"
+          [ngModel]="newNoteBookId()"
+          (ngModelChange)="newNoteBookId.set($event)"
+          placeholder="Selecciona un libro"
+          styleClass="book-dialog__input"
+          appendTo="body"
+        />
+      </div>
+      <div class="book-dialog__field">
+        <label for="newNoteTitle" class="book-dialog__label"
+          >Título <span class="book-dialog__label--optional">(opcional)</span></label
+        >
+        <input
+          id="newNoteTitle"
+          pInputText
+          type="text"
+          [ngModel]="newNoteTitle()"
+          (ngModelChange)="newNoteTitle.set($event)"
+          placeholder="Sin título"
+          class="book-dialog__input"
+          (keydown.enter)="newNoteBookId() && saveNewNote()"
+          data-testid="input-note-title"
+        />
+      </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="showCreateNoteDialog.set(false)"
+    />
+    @if (booksState.books().length > 0) {
+      <p-button
+        label="Crear nota"
+        [loading]="isSavingNewNote()"
+        [disabled]="!newNoteBookId()"
+        (onClick)="saveNewNote()"
+        data-testid="btn-save-new-note"
+      />
+    }
+  </ng-template>
+</p-dialog>
+
+<!-- DIALOG: Crear / Renombrar Libro -->
+<p-dialog
+  [visible]="showBookDialog()"
+  (visibleChange)="showBookDialog.set($event)"
+  [header]="bookDialogMode() === 'create' ? 'Nuevo libro' : 'Renombrar libro'"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '26rem' }"
+  data-testid="book-dialog"
+>
+  <div class="book-dialog__content">
+    <div class="book-dialog__field">
+      <label for="bookTitle" class="book-dialog__label">Título</label>
+      <input
+        id="bookTitle"
+        pInputText
+        type="text"
+        [ngModel]="bookTitle()"
+        (ngModelChange)="bookTitle.set($event)"
+        placeholder="Nombre del libro"
+        class="book-dialog__input"
+        autofocus
+        data-testid="input-book-title"
+      />
+    </div>
+    <div class="book-dialog__field">
+      <label class="book-dialog__label">Ícono</label>
+      <div class="book-dialog__icons">
+        @for (icon of availableIcons; track icon) {
+          <button
+            type="button"
+            class="book-dialog__icon-btn"
+            [class.book-dialog__icon-btn--selected]="bookIcon() === icon"
+            (click)="bookIcon.set(icon)"
+            [ariaLabel]="icon"
+          >
+            <i [class]="icon"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="showBookDialog.set(false)"
+    />
+    <p-button
+      [label]="bookDialogMode() === 'create' ? 'Crear' : 'Guardar'"
+      [loading]="isSavingBook()"
+      [disabled]="!bookTitle().trim()"
+      (onClick)="saveBook()"
+      data-testid="btn-save-book"
+    />
+  </ng-template>
+</p-dialog>

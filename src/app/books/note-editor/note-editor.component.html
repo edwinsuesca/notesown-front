@@ -1,0 +1,201 @@
+@if (state.selectedNote()) {
+  <div class="editor-panel__header">
+    <input
+      type="text"
+      class="editor-panel__title-input"
+      placeholder="Título de la nota"
+      [value]="state.noteTitle()"
+      (input)="state.onTitleChange($any($event.target).value)"
+      data-testid="input-note-title"
+    />
+
+    <div class="editor-panel__header-actions">
+      @if (state.saveIndicator() === 'saving') {
+        <span class="editor-panel__save-status editor-panel__save-status--saving">
+          <i class="pi pi-spin pi-spinner"></i> Guardando...
+        </span>
+      } @else if (state.saveIndicator() === 'saved') {
+        <span class="editor-panel__save-status editor-panel__save-status--saved">
+          <i class="pi pi-check"></i> Guardado
+        </span>
+      } @else {
+        <span class="editor-panel__save-status editor-panel__save-status--idle">
+          {{ formatRelativeTime(state.selectedNote()!.updated_at) }}
+        </span>
+      }
+      <div class="editor-panel__note-actions">
+        <p-menu #noteContextMenu [model]="noteMenuItems()" [popup]="true" (onBlur)="noteContextMenu.hide()" />
+        <button
+          class="editor-panel__note-menu-btn"
+          type="button"
+          aria-label="Opciones de la nota"
+          (click)="openNoteMenu($event, noteContextMenu)"
+        >
+          <i class="pi pi-ellipsis-v"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Privatizar nota -->
+  <p-dialog
+    header="Hacer nota privada"
+    [visible]="showPrivatizeDialog()"
+    (visibleChange)="showPrivatizeDialog.set($event)"
+    [modal]="true"
+    [style]="{ width: '380px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="priv-dialog">
+      <p class="priv-dialog__desc">
+        La nota se moverá a tu libro privado y solo podrás acceder a ella desde el buscador usando <code>priv:contraseña</code>.
+      </p>
+      <div class="priv-dialog__field">
+        <label class="priv-dialog__label">Confirma tu contraseña</label>
+        <p-password
+          [ngModel]="privPassword()"
+          (ngModelChange)="privPassword.set($event)"
+          [feedback]="false"
+          [toggleMask]="true"
+          [fluid]="true"
+          placeholder="Tu contraseña actual"
+          (keydown.enter)="confirmPrivatize()"
+        />
+      </div>
+      @if (privError()) {
+        <p-message severity="error" [text]="privError()" styleClass="priv-dialog__error" />
+      }
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [text]="true"
+        (onClick)="showPrivatizeDialog.set(false)"
+        [disabled]="privLoading()"
+      />
+      <p-button
+        label="Hacer privada"
+        icon="pi pi-lock"
+        [loading]="privLoading()"
+        [disabled]="!privPassword()"
+        (onClick)="confirmPrivatize()"
+        data-testid="btn-confirm-privatize"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <!-- Modal: Desprivatizar nota -->
+  <p-dialog
+    header="Quitar privacidad"
+    [visible]="showUnprivatizeDialog()"
+    (visibleChange)="showUnprivatizeDialog.set($event)"
+    [modal]="true"
+    [style]="{ width: '420px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="priv-dialog">
+      <p class="priv-dialog__desc">
+        La nota se moverá al libro que elijas y volverá a ser visible normalmente.
+      </p>
+      <div class="priv-dialog__field">
+        <label class="priv-dialog__label">Confirma tu contraseña</label>
+        <p-password
+          [ngModel]="privPassword()"
+          (ngModelChange)="privPassword.set($event)"
+          [feedback]="false"
+          [toggleMask]="true"
+          [fluid]="true"
+          placeholder="Tu contraseña actual"
+        />
+      </div>
+      <div class="priv-dialog__field">
+        <label class="priv-dialog__label">Libro destino</label>
+        <p-select
+          [options]="booksState.books()"
+          [ngModel]="targetBookId()"
+          (ngModelChange)="targetBookId.set($event)"
+          optionLabel="title"
+          optionValue="id"
+          placeholder="Selecciona un libro"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </div>
+      @if (privError()) {
+        <p-message severity="error" [text]="privError()" styleClass="priv-dialog__error" />
+      }
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [text]="true"
+        (onClick)="showUnprivatizeDialog.set(false)"
+        [disabled]="privLoading()"
+      />
+      <p-button
+        label="Quitar privacidad"
+        icon="pi pi-lock-open"
+        [loading]="privLoading()"
+        [disabled]="!privPassword() || !targetBookId()"
+        (onClick)="confirmUnprivatize()"
+        data-testid="btn-confirm-unprivatize"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <div class="editor-panel__body">
+    <div class="editor-panel__editor">
+      <p-editor
+        [ngModel]="state.noteContent()"
+        (ngModelChange)="state.onContentChange($event)"
+        [modules]="editorModules"
+        [style]="{ border: 'none' }"
+        data-testid="note-editor"
+      >
+        <ng-template pTemplate="header">
+          <span class="ql-formats">
+            <button type="button" class="ql-bold"></button>
+            <button type="button" class="ql-italic"></button>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-header">
+              <option value="1">H1</option>
+              <option value="2">H2</option>
+              <option selected>Normal</option>
+            </select>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-color" title="Color de fuente">
+              <option selected title="Color por defecto"></option>
+    
+              <option value="#10b981" title="Verde Esmeralda"></option>
+              <option value="#3b82f6" title="Azul Cielo"></option>
+              <option value="#f59e0b" title="Ámbar"></option>
+              <option value="#ef4444" title="Rojo Suave"></option>
+              <option value="#8b5cf6" title="Violeta"></option>
+              <option value="#94a3b8" title="Gris"></option>
+            </select>
+          </span>
+          <span class="ql-formats">
+            <button type="button" class="ql-list" value="ordered"></button>
+            <button type="button" class="ql-list" value="bullet"></button>
+          </span>
+          <span class="ql-formats">
+            <button type="button" class="ql-link"></button>
+          </span>
+        </ng-template>
+      </p-editor>
+    </div>
+  </div>
+} @else {
+  <div class="editor-panel__placeholder">
+    <app-empty-state
+      icon="pi pi-file-edit"
+      message="Selecciona o crea una nota para empezar"
+    />
+  </div>
+}

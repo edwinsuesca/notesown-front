@@ -1,0 +1,234 @@
+<div
+  class="flex-1 p-8 flex flex-col gap-10 bg-[var(--p-surface-ground)] max-w-[1200px] mx-auto w-full"
+>
+  <!-- HEADER -->
+  <header class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-[1.75rem] font-bold m-0 mb-1 text-[var(--p-text-color)] leading-tight">
+        Hola, {{ userFirstName() }} 👋
+      </h1>
+      <p class="text-sm text-[var(--p-text-muted-color)] m-0">
+        Aquí tienes un resumen de tu espacio de notas
+      </p>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <section class="flex flex-col gap-3.5">
+    <div class="grid grid-cols-3 gap-4">
+      @if (isLoadingStats()) {
+        @for (i of [1, 2, 3]; track i) {
+          <div
+            class="flex flex-col items-center gap-2 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] text-center"
+          >
+            <p-skeleton width="2rem" height="2rem" borderRadius="8px" />
+            <p-skeleton width="3rem" height="1.75rem" />
+            <p-skeleton width="5rem" height="0.875rem" />
+          </div>
+        }
+      } @else {
+        <div
+          class="flex flex-col items-center gap-2 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] text-center"
+        >
+          <div
+            class="w-10 h-10 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--nw-cyan-500)_12%,transparent)] text-[var(--nw-accent-text)]"
+          >
+            <i class="pi pi-book"></i>
+          </div>
+          <span class="text-[1.75rem] font-bold text-[var(--p-text-color)] leading-none">{{
+            booksCount()
+          }}</span>
+          <span class="text-xs text-[var(--p-text-muted-color)] font-medium">{{
+            booksCount() === 1 ? 'libro' : 'libros'
+          }}</span>
+        </div>
+        <div
+          class="flex flex-col items-center gap-2 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] text-center"
+        >
+          <div
+            class="w-10 h-10 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--p-green-500,#22c55e)_12%,transparent)] text-green-600"
+          >
+            <i class="pi pi-file"></i>
+          </div>
+          <span class="text-[1.75rem] font-bold text-[var(--p-text-color)] leading-none">{{
+            totalNotes()
+          }}</span>
+          <span class="text-xs text-[var(--p-text-muted-color)] font-medium">{{
+            totalNotes() === 1 ? 'nota' : 'notas'
+          }}</span>
+        </div>
+        <div
+          class="flex flex-col items-center gap-2 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] text-center"
+        >
+          <div
+            class="w-10 h-10 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--p-orange-500,#f97316)_12%,transparent)] text-orange-600"
+          >
+            <i class="pi pi-pencil"></i>
+          </div>
+          <span class="text-[1.75rem] font-bold text-[var(--p-text-color)] leading-none">{{
+            modifiedTodayCount()
+          }}</span>
+          <span class="text-xs text-[var(--p-text-muted-color)] font-medium">modificadas hoy</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ACCIONES RÁPIDAS -->
+  <section class="flex flex-col gap-3.5">
+    <h2 class="text-xs font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0">
+      Acciones rápidas
+    </h2>
+    <div class="grid grid-cols-4 gap-3.5">
+      <button
+        class="flex flex-col items-center gap-2.5 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] cursor-pointer text-decoration-none text-[var(--p-text-color)] transition-all -webkit-tap-highlight-transparent touch-manipulation active:bg-[var(--nw-accent-subtle-bg)] active:border-[var(--nw-accent-subtle-border)] md:hover:bg-[var(--nw-accent-subtle-bg)] md:hover:border-[var(--nw-accent-subtle-border)] md:hover:shadow-[var(--nw-shadow-md)]"
+        type="button"
+        (click)="createNote()"
+      >
+        <div
+          class="w-11 h-11 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--nw-cyan-500)_15%,transparent)] text-[var(--nw-accent-text)]"
+        >
+          <i class="pi pi-plus"></i>
+        </div>
+        <span class="text-xs font-medium text-center">Nueva nota</span>
+      </button>
+      <button
+        class="flex flex-col items-center gap-2.5 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] cursor-pointer text-decoration-none text-[var(--p-text-color)] transition-all -webkit-tap-highlight-transparent touch-manipulation active:bg-[var(--nw-accent-subtle-bg)] active:border-[var(--nw-accent-subtle-border)] md:hover:bg-[var(--nw-accent-subtle-bg)] md:hover:border-[var(--nw-accent-subtle-border)] md:hover:shadow-[var(--nw-shadow-md)]"
+        type="button"
+        (click)="createBook()"
+      >
+        <div
+          class="w-11 h-11 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--p-purple-500,#a855f7)_12%,transparent)] text-purple-600"
+        >
+          <i class="pi pi-book"></i>
+        </div>
+        <span class="text-xs font-medium text-center">Nuevo libro</span>
+      </button>
+      <a
+        class="flex flex-col items-center gap-2.5 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] cursor-pointer text-decoration-none text-[var(--p-text-color)] transition-all -webkit-tap-highlight-transparent touch-manipulation active:bg-[var(--nw-accent-subtle-bg)] active:border-[var(--nw-accent-subtle-border)] md:hover:bg-[var(--nw-accent-subtle-bg)] md:hover:border-[var(--nw-accent-subtle-border)] md:hover:shadow-[var(--nw-shadow-md)]"
+        routerLink="/app/search"
+      >
+        <div
+          class="w-11 h-11 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--p-blue-500,#3b82f6)_12%,transparent)] text-blue-600"
+        >
+          <i class="pi pi-search"></i>
+        </div>
+        <span class="text-xs font-medium text-center">Buscar</span>
+      </a>
+      <a
+        class="flex flex-col items-center gap-2.5 p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-lg)] shadow-[var(--nw-shadow-sm)] cursor-pointer text-decoration-none text-[var(--p-text-color)] transition-all -webkit-tap-highlight-transparent touch-manipulation active:bg-[var(--nw-accent-subtle-bg)] active:border-[var(--nw-accent-subtle-border)] md:hover:bg-[var(--nw-accent-subtle-bg)] md:hover:border-[var(--nw-accent-subtle-border)] md:hover:shadow-[var(--nw-shadow-md)]"
+        routerLink="/app/recent-modified"
+      >
+        <div
+          class="w-11 h-11 rounded-[var(--nw-radius-md)] flex items-center justify-center text-lg bg-[color-mix(in_srgb,var(--p-orange-500,#f97316)_12%,transparent)] text-orange-600"
+        >
+          <i class="pi pi-history"></i>
+        </div>
+        <span class="text-xs font-medium text-center">Recientes</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- LIBROS -->
+  <section class="flex flex-col gap-3.5">
+    <div class="flex items-center justify-between">
+      <h2
+        class="text-xs font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0"
+      >
+        Mis libros
+      </h2>
+    </div>
+    @if (booksState.books().length === 0 && !isLoadingStats()) {
+      <p class="text-sm text-[var(--p-text-muted-color)] italic m-0">
+        Crea tu primer libro para empezar
+      </p>
+    } @else {
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3">
+        @if (isLoadingStats()) {
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div
+              class="flex items-center gap-3 p-3.5 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-md)] min-w-0"
+            >
+              <p-skeleton width="2rem" height="2rem" borderRadius="8px" />
+              <p-skeleton width="80%" height="1rem" />
+            </div>
+          }
+        } @else {
+          @for (book of booksState.books(); track book.id) {
+            <a
+              class="flex items-center gap-3 p-3.5 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-md)] text-decoration-none text-[var(--p-text-color)] cursor-pointer transition-colors touch-manipulation -webkit-tap-highlight-transparent min-w-0 active:bg-[var(--nw-accent-subtle-bg)] md:hover:bg-[var(--nw-accent-subtle-bg)] md:hover:border-[var(--nw-accent-subtle-border)]"
+              [routerLink]="['/app', book.id]"
+            >
+              <div
+                class="w-8 h-8 rounded-[var(--nw-radius-sm)] bg-[color-mix(in_srgb,var(--nw-cyan-500)_12%,transparent)] flex items-center justify-center text-[0.9rem] text-[var(--nw-accent-text)] shrink-0"
+              >
+                <i [class]="book.icon"></i>
+              </div>
+              <span
+                class="flex-1 text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+                >{{ book.title }}</span
+              >
+              <i class="pi pi-chevron-right text-xs text-[var(--p-text-muted-color)] shrink-0"></i>
+            </a>
+          }
+        }
+      </div>
+    }
+  </section>
+
+  <!-- NOTAS RECIENTES -->
+  @if (!isLoadingStats() && (recentRead().length > 0 || recentModified().length > 0)) {
+    <section class="flex flex-col gap-3.5">
+      <h2
+        class="text-xs font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0"
+      >
+        Notas recientes
+      </h2>
+      <div class="grid grid-cols-2 gap-6">
+        @if (recentRead().length > 0) {
+          <div class="flex flex-col gap-2 min-w-0">
+            <h3
+              class="flex items-center gap-2 text-xs font-semibold text-[var(--p-text-muted-color)] m-0 mb-1"
+            >
+              <i class="text-xs pi pi-clock"></i>
+              Leídas recientemente
+            </h3>
+            <div class="flex flex-col gap-1">
+              @for (note of recentRead(); track note.id) {
+                <app-note-item
+                  [note]="note"
+                  [isActive]="false"
+                  [metaDate]="note.last_read_at || note.updated_at"
+                  [canDelete]="false"
+                  (noteClick)="openNote($event)"
+                />
+              }
+            </div>
+          </div>
+        }
+
+        @if (recentModified().length > 0) {
+          <div class="flex flex-col gap-2 min-w-0">
+            <h3
+              class="flex items-center gap-2 text-xs font-semibold text-[var(--p-text-muted-color)] m-0 mb-1"
+            >
+              <i class="text-xs pi pi-history"></i>
+              Modificadas recientemente
+            </h3>
+            <div class="flex flex-col gap-1">
+              @for (note of recentModified(); track note.id) {
+                <app-note-item
+                  [note]="note"
+                  [isActive]="false"
+                  [metaDate]="note.updated_at"
+                  [canDelete]="false"
+                  (noteClick)="openNote($event)"
+                />
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>

@@ -1,0 +1,167 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* BODY */
+.settings-body {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* SECTION */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-text-muted-color);
+  margin: 0;
+}
+
+.settings-section__description {
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+  margin: 0;
+}
+
+/* CARD */
+.settings-card {
+  background: var(--p-surface-card);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: calc(var(--nw-radius-md) * 1.5);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--p-text-color);
+}
+
+.settings-card__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--p-text-muted-color);
+  background: var(--nw-accent-subtle-bg);
+  border: 1px solid var(--nw-accent-subtle-border);
+  border-radius: var(--nw-radius-md);
+  padding: 0.625rem 0.75rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.settings-card__notice .pi {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: var(--nw-accent-text);
+}
+
+/* FORM */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.settings-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--p-text-color);
+}
+
+.settings-input {
+  width: 100%;
+}
+
+.settings-message {
+  width: 100%;
+}
+
+/* ACCORDION */
+.settings-accordion {
+  width: 100%;
+}
+
+/* FAQ CONTENT */
+.faq-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--p-text-color);
+}
+
+.faq-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--p-text-muted-color);
+}
+
+.faq-warning {
+  background: color-mix(in srgb, var(--p-yellow-500) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-yellow-500) 40%, transparent);
+  border-radius: var(--nw-radius-md);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+  color: var(--p-text-color);
+}
+
+:host ::ng-deep p-accordion-content p {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--p-text-color);
+  line-height: 1.6;
+}
+
+:host ::ng-deep p-accordion-content p:last-child {
+  margin-bottom: 0;
+}

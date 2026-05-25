@@ -1,0 +1,25 @@
+<div class="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
+  @if (isLoading()) {
+    @for (item of [1, 2, 3, 4, 5]; track item) {
+      <div
+        class="p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-lg flex flex-col gap-2"
+      >
+        <div class="h-3.5 w-[60%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+        <div class="h-3 w-[90%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+        <div class="h-2.5 w-[35%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+      </div>
+    }
+  } @else if (notes().length === 0) {
+    <app-empty-state icon="pi pi-clock" message="No hay notas recientes" />
+  } @else {
+    @for (note of notes(); track note.id) {
+      <app-note-item
+        [note]="note"
+        [isActive]="editorState.selectedNote()?.id === note.id"
+        [metaDate]="mode() === 'read' ? note.last_read_at : note.updated_at"
+        [testId]="'recent-note-' + note.id"
+        (noteClick)="openNote($event)"
+      />
+    }
+  }
+</div>

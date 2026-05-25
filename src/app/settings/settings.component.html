@@ -1,0 +1,290 @@
+<div class="flex flex-col flex-1 min-h-0 overflow-y-auto">
+  <div class="flex-1 p-6 flex flex-col gap-2">
+    <!-- ── SECCIÓN: DATOS ─────────────────────────────────────── -->
+    <section class="flex flex-col gap-4">
+      <h2
+        class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0"
+      >
+        <i class="pi pi-database"></i>
+        Datos
+      </h2>
+
+      <div class="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+        <div
+          class="bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[calc(var(--nw-radius-md)*1.5)] p-5 flex flex-col gap-4"
+        >
+          <h3 class="text-base font-semibold m-0 text-[var(--p-text-color)]">Exportar notas</h3>
+          <p class="text-sm text-[var(--p-text-muted-color)] m-0">
+            Descarga todas tus notas en un archivo JSON. El contenido se exporta en texto plano con
+            el formato del editor incluido (negrita, listas, colores, etc.). Guarda el archivo en un
+            lugar seguro.
+          </p>
+          <p-button
+            label="Exportar notas"
+            icon="pi pi-download"
+            severity="secondary"
+            [loading]="isExporting()"
+            (onClick)="exportNotes()"
+          />
+        </div>
+
+        <div
+          class="bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[calc(var(--nw-radius-md)*1.5)] p-5 flex flex-col gap-4"
+        >
+          <h3 class="text-base font-semibold m-0 text-[var(--p-text-color)]">Importar notas</h3>
+          <p class="text-sm text-[var(--p-text-muted-color)] m-0">
+            Carga un archivo JSON exportado desde Notesown. Los libros se crean si no existen. Las
+            notas con el mismo título en el mismo libro se sobreescribirán.
+          </p>
+          <input
+            #fileInput
+            type="file"
+            accept=".json"
+            hidden
+            (change)="onImportFileSelected($event)"
+          />
+          <p-button
+            label="Importar notas"
+            icon="pi pi-upload"
+            severity="secondary"
+            [loading]="isImporting()"
+            (onClick)="fileInput.click()"
+          />
+        </div>
+      </div>
+    </section>
+
+    <p-divider />
+
+    <!-- ── SECCIÓN: PRIVACIDAD Y CIFRADO ─────────────────────────── -->
+    <section class="flex flex-col gap-4">
+      <h2
+        class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0"
+      >
+        <i class="pi pi-lock"></i>
+        Privacidad y cifrado (E2EE)
+      </h2>
+      <p class="text-sm text-[var(--p-text-muted-color)] m-0">
+        Tus notas están protegidas con cifrado de extremo a extremo. Solo tú puedes leerlas.
+      </p>
+
+      <p-accordion class="w-full">
+        <p-accordion-panel value="what">
+          <p-accordion-header>¿Qué está cifrado?</p-accordion-header>
+          <p-accordion-content>
+            <ul class="faq-list">
+              <li>
+                <strong>Contenido de la nota</strong> — cifrado AES-256-GCM. Solo tú puedes leerlo.
+              </li>
+              <li><strong>Título</strong> — no cifrado. Visible para búsqueda rápida.</li>
+              <li>
+                <strong>Nombre del libro y fechas</strong> — no cifrados. Son metadatos de
+                organización.
+              </li>
+            </ul>
+            <p class="faq-note">
+              El contenido nunca se almacena en texto plano en el servidor. Ni siquiera el equipo de
+              Notesown puede leerlo.
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="how">
+          <p-accordion-header>¿Cómo funciona el cifrado?</p-accordion-header>
+          <p-accordion-content>
+            <p>
+              Tu contraseña se usa <strong>localmente en tu dispositivo</strong> para desbloquear
+              una clave secreta (CEK). Esta clave:
+            </p>
+            <ul class="faq-list">
+              <li>Nunca sale de tu dispositivo ni se envía al servidor.</li>
+              <li>Cifra y descifra el contenido de tus notas en el momento.</li>
+              <li>En el servidor solo se guarda una versión <strong>cifrada</strong> de ella.</li>
+            </ul>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="multidevice">
+          <p-accordion-header
+            >¿Puedo usar Notesown desde múltiples dispositivos?</p-accordion-header
+          >
+          <p-accordion-content>
+            <p>
+              Sí. Inicia sesión normalmente en cada dispositivo con tu email y contraseña. La clave
+              se reconstruye localmente en cada uno. No necesitas hacer nada especial.
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="browser-close">
+          <p-accordion-header
+            >¿Qué pasa si cierro el navegador sin cerrar sesión?</p-accordion-header
+          >
+          <p-accordion-content>
+            <p>
+              La sesión de Supabase persiste (token guardado), pero la clave de cifrado se elimina
+              al cerrar el navegador. La próxima vez que abras la app necesitarás iniciar sesión de
+              nuevo para descifrar las notas.
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="old-notes">
+          <p-accordion-header>¿Mis notas antiguas están cifradas?</p-accordion-header>
+          <p-accordion-content>
+            <p>
+              Las notas creadas antes de activar el cifrado se migran automáticamente
+              <strong>la próxima vez que las edites y guardes</strong>. Hasta entonces permanecen en
+              texto plano en el servidor (legibles solo por ti gracias a las políticas RLS de
+              Supabase).
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="lost-password">
+          <p-accordion-header>¿Qué pasa si olvido mi contraseña?</p-accordion-header>
+          <p-accordion-content>
+            <p class="faq-warning">
+              ⚠️ Si olvidas tu contraseña,
+              <strong>el contenido de tus notas es irrecuperable</strong>. No existe una "llave
+              maestra".
+            </p>
+            <p>
+              Esta es la consecuencia directa del cifrado de extremo a extremo: nadie más que tú
+              puede descifrar tus notas.
+            </p>
+            <p>
+              <strong>Recomendación:</strong> Usa un gestor de contraseñas para nunca olvidarla.
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="outside-change">
+          <p-accordion-header
+            >¿Qué pasa si cambio la contraseña fuera de la app?</p-accordion-header
+          >
+          <p-accordion-content>
+            <p class="faq-warning">
+              ⚠️ Si cambias la contraseña directamente en Supabase (no desde este formulario), la
+              clave de cifrado <strong>no se actualiza</strong> y tus notas quedarán inaccesibles.
+            </p>
+            <ul class="faq-list">
+              <li>Tus notas no se borran, siguen en el servidor.</li>
+              <li>El problema es que la clave ya no coincide con tu nueva contraseña.</li>
+              <li>
+                No hay forma de recuperar el contenido a menos que recuerdes la contraseña anterior.
+              </li>
+            </ul>
+            <p>
+              <strong
+                >Siempre usa el formulario de esta pantalla para cambiar la contraseña.</strong
+              >
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="technology">
+          <p-accordion-header>¿Qué tecnología se usa?</p-accordion-header>
+          <p-accordion-content>
+            <ul class="faq-list">
+              <li><strong>Cifrado:</strong> AES-256-GCM (estándar bancario).</li>
+              <li>
+                <strong>Derivación de clave:</strong> PBKDF2-SHA256 con 600.000 iteraciones (OWASP
+                2024).
+              </li>
+              <li><strong>Arquitectura:</strong> Wrapped Key (usada por 1Password y Bitwarden).</li>
+              <li>
+                <strong>API:</strong> Web Crypto API nativa del navegador, sin librerías externas.
+              </li>
+            </ul>
+          </p-accordion-content>
+        </p-accordion-panel>
+      </p-accordion>
+    </section>
+
+    <p-divider />
+
+    <!-- ── SECCIÓN: SEGURIDAD ─────────────────────────────────────── -->
+    <section class="flex flex-col gap-4">
+      <h2
+        class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--p-text-muted-color)] m-0"
+      >
+        <i class="pi pi-shield"></i>
+        Seguridad
+      </h2>
+
+      <div
+        class="bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-[calc(var(--nw-radius-md)*1.5)] p-5 flex flex-col gap-4"
+      >
+        <h3 class="text-base font-semibold m-0 text-[var(--p-text-color)]">Cambiar contraseña</h3>
+        <p
+          class="flex items-start gap-2 text-xs text-[var(--p-text-muted-color)] bg-[var(--nw-accent-subtle-bg)] border border-[var(--nw-accent-subtle-border)] rounded-[var(--nw-radius-md)] p-2.5 m-0 leading-relaxed"
+        >
+          <i class="pi pi-lock shrink-0 mt-0.5 text-[var(--nw-accent-text)]"></i>
+          La clave de cifrado de tus notas se actualizará automáticamente con tu nueva contraseña.
+          Usa siempre este formulario, nunca el panel de Supabase.
+        </p>
+
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="oldPassword" class="text-sm font-medium text-[var(--p-text-color)]"
+              >Contraseña actual</label
+            >
+            <p-password
+              inputId="oldPassword"
+              [ngModel]="oldPassword()"
+              (ngModelChange)="oldPassword.set($event)"
+              [feedback]="false"
+              [toggleMask]="true"
+              [fluid]="true"
+              placeholder="Tu contraseña actual"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="newPassword" class="text-sm font-medium text-[var(--p-text-color)]"
+              >Nueva contraseña</label
+            >
+            <p-password
+              inputId="newPassword"
+              [ngModel]="newPassword()"
+              (ngModelChange)="newPassword.set($event)"
+              [feedback]="true"
+              [toggleMask]="true"
+              [fluid]="true"
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="confirmPassword" class="text-sm font-medium text-[var(--p-text-color)]"
+              >Confirmar nueva contraseña</label
+            >
+            <p-password
+              inputId="confirmPassword"
+              [ngModel]="confirmPassword()"
+              (ngModelChange)="confirmPassword.set($event)"
+              [feedback]="false"
+              [toggleMask]="true"
+              [fluid]="true"
+              placeholder="Repite la nueva contraseña"
+            />
+          </div>
+
+          @if (changePasswordError()) {
+            <p-message severity="error" [text]="changePasswordError()" class="w-full" />
+          }
+
+          <p-button
+            label="Actualizar contraseña"
+            icon="pi pi-check"
+            [loading]="isChangingPassword()"
+            [disabled]="!oldPassword() || !newPassword() || !confirmPassword()"
+            (onClick)="changePassword()"
+            data-testid="btn-confirm-change-password"
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

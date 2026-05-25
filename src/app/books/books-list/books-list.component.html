@@ -1,0 +1,66 @@
+<aside class="flex-1 w-full flex flex-col bg-[var(--p-surface-card)] overflow-hidden">
+  <div
+    class="flex items-center justify-between p-4 pb-3 border-b border-[var(--p-content-border-color)] shrink-0"
+  >
+    <div class="flex flex-col gap-1 overflow-hidden">
+      <h2
+        class="text-base font-semibold m-0 text-[var(--p-text-color)] whitespace-nowrap overflow-hidden text-ellipsis"
+      >
+        {{ book()?.title ?? 'Notas' }}
+      </h2>
+      <p class="text-xs text-[var(--p-text-muted-color)] m-0">
+        {{ notes().length }} {{ notes().length === 1 ? 'documento' : 'documentos' }}
+      </p>
+    </div>
+    <p-button
+      icon="pi pi-plus"
+      ariaLabel="Nueva nota"
+      pTooltip="Nueva nota"
+      tooltipPosition="top"
+      [text]="true"
+      severity="secondary"
+      [loading]="isCreatingNote()"
+      (onClick)="createNote(book()!.id)"
+      [disabled]="!book()"
+      data-testid="btn-new-note"
+    />
+  </div>
+
+  <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
+    @if (!book()) {
+      <div class="flex flex-col items-center pt-8 gap-2">
+        <app-empty-state icon="pi pi-book" message="Selecciona un libro para ver notas" />
+      </div>
+    } @else if (isLoadingNotes()) {
+      @for (item of [1, 2, 3]; track item) {
+        <div class="p-3 flex flex-col gap-2">
+          <div class="h-3.5 w-[70%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+          <div class="h-3 w-[90%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+          <div class="h-2.5 w-[40%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+        </div>
+      }
+    } @else if (notes().length === 0) {
+      <div class="flex flex-col items-center pt-8 gap-2">
+        <app-empty-state icon="pi pi-file" message="No hay notas en este libro" />
+        <p-button
+          label="Crear primera nota"
+          [text]="true"
+          (onClick)="createNote(book()!.id)"
+          data-testid="btn-first-note"
+        />
+      </div>
+    } @else {
+      @for (note of notes(); track note.id) {
+        <app-note-item
+          [note]="note"
+          [isActive]="editorState.selectedNote()?.id === note.id"
+          [metaDate]="note.updated_at"
+          [canDelete]="true"
+          [testId]="'note-item-' + note.id"
+          (noteClick)="selectNote($event)"
+          (deleteClick)="confirmDeleteNote($event.note, $event.event)"
+        />
+      }
+    }
+  </div>
+</aside>

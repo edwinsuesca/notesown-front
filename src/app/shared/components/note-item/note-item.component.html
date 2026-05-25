@@ -1,0 +1,32 @@
+<button
+  type="button"
+  class="w-full text-left bg-transparent border border-[var(--p-content-border-color)] rounded-[var(--nw-radius-md)] p-3 flex items-start gap-2 relative transition-all duration-150 hover:bg-[var(--nw-hover-neutral-bg)] hover:border-[var(--nw-hover-item-border)] group"
+  [class.active]="isActive()"
+  (click)="onNoteClick()"
+  [attr.data-testid]="testId()"
+>
+  <div class="flex-1 overflow-hidden flex flex-col gap-1">
+    <p
+      class="text-sm font-semibold m-0 text-[var(--p-text-color)] whitespace-nowrap overflow-hidden text-ellipsis"
+    >
+      {{ note().title || 'Sin título' }}
+    </p>
+    <p class="text-[0.8rem] text-[var(--p-text-muted-color)] m-0 line-clamp-2">
+      {{ stripHtml(note().content) || 'Sin contenido' }}
+    </p>
+    <p class="text-xs text-[var(--nw-cyan-700)] mt-1 italic">
+      {{ formatRelativeTime(metaDate()) }}
+    </p>
+  </div>
+  @if (canDelete()) {
+    <button
+      type="button"
+      class="opacity-0 group-hover:opacity-100 transition-all duration-150 text-[var(--p-text-muted-color)] hover:text-[var(--nw-hover-danger-color)] hover:bg-[var(--nw-hover-danger-bg)] p-1 rounded shrink-0"
+      (click)="onDeleteClick($event)"
+      aria-label="Eliminar nota"
+      [attr.data-testid]="'btn-delete-' + note().id"
+    >
+      <i class="pi pi-trash"></i>
+    </button>
+  }
+</button>

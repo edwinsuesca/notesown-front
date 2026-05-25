@@ -1,0 +1,83 @@
+<div class="flex-1 flex flex-col overflow-hidden bg-[var(--p-surface-card)]">
+  <div
+    class="p-4 pb-3 border-b border-[var(--p-content-border-color)] bg-[var(--p-surface-card)] flex flex-col gap-4 shrink-0"
+  >
+    <h2 class="text-xl font-semibold m-0 text-[var(--p-text-color)]">Buscar</h2>
+    <div class="relative flex items-center">
+      <span
+        class="pi pi-search absolute left-3 text-[var(--p-text-muted-color)] pointer-events-none"
+      ></span>
+      <input
+        pInputText
+        type="search"
+        placeholder="Buscar en todas las notas..."
+        [value]="query()"
+        (input)="onQueryChange($any($event.target).value)"
+        class="w-full !pl-9"
+        autofocus
+        data-testid="input-search"
+      />
+    </div>
+  </div>
+
+  <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
+    @if (isSearching()) {
+      @if (isPrivMode()) {
+        <div
+          class="flex items-center gap-2 text-sm font-semibold text-[var(--nw-accent-text)] bg-[var(--nw-accent-subtle-bg)] border border-[var(--nw-accent-subtle-border)] rounded-[var(--nw-radius-md)] p-2"
+        >
+          <i class="pi pi-spin pi-spinner"></i>
+          Verificando contraseña...
+        </div>
+      }
+      @for (item of [1, 2, 3]; track item) {
+        <div
+          class="p-4 bg-[var(--p-surface-card)] border border-[var(--p-content-border-color)] rounded-lg flex flex-col gap-2"
+        >
+          <div class="h-3.5 w-[60%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+          <div class="h-3 w-[90%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+          <div class="h-2.5 w-[35%] rounded bg-[var(--p-content-border-color)] animate-pulse"></div>
+        </div>
+      }
+    } @else if (isPrivMode() && privError()) {
+      <app-empty-state icon="pi pi-lock" [message]="privError()" />
+    } @else if (isPrivMode() && hasSearched() && results().length === 0) {
+      <div
+        class="flex items-center gap-2 text-sm font-semibold text-[var(--nw-accent-text)] bg-[var(--nw-accent-subtle-bg)] border border-[var(--nw-accent-subtle-border)] rounded-[var(--nw-radius-md)] p-2"
+      >
+        <i class="pi pi-lock"></i>
+        Notas privadas
+      </div>
+      <app-empty-state icon="pi pi-file" message="No hay notas privadas" />
+    } @else if (hasSearched() && results().length === 0) {
+      <app-empty-state
+        icon="pi pi-search-minus"
+        message="No se encontraron notas con ese término"
+      />
+    } @else if (!hasSearched()) {
+      <app-empty-state icon="pi pi-search" message="Escribe para buscar en tus notas" />
+    } @else {
+      @if (isPrivMode()) {
+        <div
+          class="flex items-center gap-2 text-sm font-semibold text-[var(--nw-accent-text)] bg-[var(--nw-accent-subtle-bg)] border border-[var(--nw-accent-subtle-border)] rounded-[var(--nw-radius-md)] p-2"
+        >
+          <i class="pi pi-lock"></i>
+          Notas privadas
+        </div>
+      } @else {
+        <p class="text-xs text-[var(--p-text-muted-color)] m-0 mb-2">
+          {{ results().length }} resultado{{ results().length !== 1 ? 's' : '' }}
+        </p>
+      }
+      @for (note of results(); track note.id) {
+        <app-note-item
+          [note]="note"
+          [isActive]="editorState.selectedNote()?.id === note.id"
+          [metaDate]="note.updated_at"
+          [testId]="'search-result-' + note.id"
+          (noteClick)="openNote($event)"
+        />
+      }
+    }
+  </div>
+</div>

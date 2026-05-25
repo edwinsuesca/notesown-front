@@ -1,0 +1,297 @@
+@import 'primeicons/primeicons.css';
+@import 'tailwindcss';
+
+@theme {
+  /* Cyan palette */
+  --color-nw-cyan-50: #ecfeff;
+  --color-nw-cyan-100: #cffafe;
+  --color-nw-cyan-200: #a5f3fc;
+  --color-nw-cyan-300: #67e8f9;
+  --color-nw-cyan-400: #22d3ee;
+  --color-nw-cyan-500: #06b6d4;
+  --color-nw-cyan-600: #0891b2;
+  --color-nw-cyan-700: #0e7490;
+  --color-nw-cyan-800: #155e75;
+  --color-nw-cyan-900: #164e63;
+  --color-nw-cyan-950: #083344;
+
+  /* Border radius */
+  --radius-nw-xs: 3px;
+  --radius-nw-sm: 6px;
+  --radius-nw-md: 8px;
+  --radius-nw-lg: 12px;
+  --radius-nw-xl: 16px;
+
+  /* Shadows */
+  --shadow-nw-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  --shadow-nw-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* ============================================================
+   DRAWER SIDEBAR MOBILE — override global (el drawer es portal en body)
+   ============================================================ */
+
+.nw-sidebar-drawer {
+  border-style: none !important;
+}
+
+.nw-sidebar-drawer .p-drawer-header {
+  display: none;
+}
+
+.nw-sidebar-drawer .p-drawer-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   P-MENU DANGER ITEM
+   ============================================================ */
+
+.nw-menu-danger .p-menu-item-link,
+.nw-menu-danger .p-menu-item-label,
+.nw-menu-danger .p-menuitem-icon {
+  color: var(--p-red-500) !important;
+}
+
+/* ============================================================
+   NOTESOWN DESIGN SYSTEM
+   Fuente única de verdad para tokens de diseño.
+   Prefijo --nw-* para distinguir de tokens de PrimeNG (--p-*).
+   ============================================================ */
+
+:root {
+  /* --- Paleta Cyan (acento de marca, #06b6d4) --- */
+  --nw-cyan-50: #ecfeff;
+  --nw-cyan-100: #cffafe;
+  --nw-cyan-200: #a5f3fc;
+  --nw-cyan-300: #67e8f9;
+  --nw-cyan-400: #22d3ee;
+  --nw-cyan-500: #06b6d4;
+  --nw-cyan-600: #0891b2;
+  --nw-cyan-700: #0e7490;
+  --nw-cyan-800: #155e75;
+  --nw-cyan-900: #164e63;
+  --nw-cyan-950: #083344;
+
+  /* --- Tokens semánticos (modo claro por defecto) --- */
+  --nw-brand-color: #06b6d4; /* Nombre de la app, siempre cyan */
+  --nw-accent: var(--nw-cyan-500);
+  --nw-accent-hover: var(--nw-cyan-600);
+  --nw-accent-subtle-bg: var(--nw-cyan-50);
+  --nw-accent-subtle-border: var(--nw-cyan-200);
+  --nw-accent-text: var(--nw-cyan-700);
+
+  /* --- Overlay (valor concreto, --p-surface-card usa oklch y no resuelve en todos los contextos) --- */
+  --nw-overlay-bg: #ffffff;
+  --p-ripple-background: #ffffff4d !important;
+
+  /* --- Radio de bordes --- */
+  --nw-radius-xs: 3px;
+  --nw-radius-sm: 6px;
+  --nw-radius-md: 8px;
+  --nw-radius-lg: 12px;
+  --nw-radius-xl: 16px;
+
+  /* --- Transiciones --- */
+  --nw-transition-fast: 100ms ease;
+  --nw-transition: 150ms ease;
+  --nw-transition-slow: 250ms ease;
+
+  /* --- Sombras --- */
+  --nw-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  --nw-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+  /* --- Brand sidebar --- */
+  --nw-brand-icon-size: 1.5rem;
+  --nw-brand-font-size: 1rem;
+  --nw-brand-font-weight: 700;
+  --nw-brand-sidebar-bg: #f9f9f9;
+
+  /* --- Hover: 3 categorías --- */
+  /* neutral: sidebar, nav — fondo cyan muy sutil, coherente con el acento de marca */
+  --nw-hover-neutral-bg: color-mix(in srgb, var(--nw-accent) 8%, transparent);
+
+  /* item: tarjetas seleccionables (notas, búsqueda, recientes) — borde acento sutil */
+  --nw-hover-item-bg: var(--nw-accent-subtle-bg);
+  --nw-hover-item-border: var(--nw-accent-subtle-border);
+
+  /* danger: botones destructivos (borrar) */
+  --nw-hover-danger-bg: var(--p-red-50, #fef2f2);
+  --nw-hover-danger-color: var(--p-red-500, #ef4444);
+
+  --p-content-border-color: #ececec !important;
+}
+
+/* Tokens semánticos en modo oscuro */
+.app-dark {
+  --nw-accent: var(--nw-cyan-400); /* cyan-400 más visible sobre dark */
+  --nw-accent-hover: var(--nw-cyan-500);
+  --nw-accent-subtle-bg: color-mix(in srgb, var(--nw-cyan-500) 15%, transparent);
+  --nw-accent-subtle-border: color-mix(in srgb, var(--nw-cyan-500) 40%, transparent);
+  --nw-accent-text: var(--nw-cyan-300);
+
+  /* Overlay en dark = superficie más elevada (valor concreto, --p-surface-section no resuelve en todos los contextos) */
+  --nw-overlay-bg: #1e1e1e;
+  --p-ripple-background: #0000004d !important;
+
+  /* Sombras más sutiles en dark */
+  --nw-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.25);
+  --nw-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35);
+  --nw-brand-sidebar-bg: rgb(14, 14, 14);
+
+  /* Hover en dark */
+  --nw-hover-danger-bg: color-mix(in srgb, var(--p-red-500, #ef4444) 15%, transparent);
+  --p-content-border-color: #222222 !important;
+}
+
+/* ============================================================
+   RESET Y BASE
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(
+    --p-font-family,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif
+  );
+}
+
+/* ============================================================
+   QUILL EDITOR — OVERRIDES GLOBALES
+   ============================================================ */
+
+/* Toolbar base */
+.ql-toolbar {
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid var(--p-content-border-color) !important;
+  background: var(--p-surface-card) !important;
+}
+
+/* Contenedor y editor */
+.ql-container {
+  border: none !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  color: var(--p-text-color) !important;
+  background: transparent !important;
+}
+
+.ql-editor {
+  padding: 1rem 0 !important;
+  line-height: 1.7 !important;
+  color: var(--p-text-color) !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--p-text-muted-color) !important;
+  font-style: italic !important;
+}
+
+/* Íconos del toolbar — modo claro */
+.ql-snow .ql-stroke {
+  stroke: var(--p-text-color) !important;
+}
+
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
+  fill: var(--p-text-color) !important;
+}
+
+.ql-snow .ql-picker {
+  color: var(--p-text-color) !important;
+}
+
+/* Tooltip de enlace — modo claro */
+.ql-snow .ql-tooltip {
+  border-color: var(--p-content-border-color) !important;
+  background: var(--nw-overlay-bg) !important;
+  color: var(--p-text-color) !important;
+  box-shadow: var(--nw-shadow-md) !important;
+}
+
+/* ============================================================
+   QUILL EDITOR — DARK MODE
+   ============================================================ */
+
+.app-dark .ql-toolbar {
+  background: var(--p-surface-section) !important;
+  border-bottom-color: var(--p-content-border-color) !important;
+}
+
+.app-dark .p-editor-content,
+.app-dark .ql-container,
+.app-dark .ql-editor {
+  background: transparent !important;
+  color: var(--p-text-color) !important;
+}
+
+.app-dark .ql-snow .ql-stroke {
+  stroke: var(--p-text-color) !important;
+}
+
+.app-dark .ql-snow .ql-fill,
+.app-dark .ql-snow .ql-stroke.ql-fill {
+  fill: var(--p-text-color) !important;
+}
+
+.app-dark .ql-snow .ql-picker {
+  color: var(--p-text-color) !important;
+}
+
+.app-dark .ql-snow .ql-picker-options {
+  background: var(--nw-overlay-bg) !important;
+  border-color: var(--p-content-border-color) !important;
+  color: var(--p-text-color) !important;
+  box-shadow: var(--nw-shadow-md) !important;
+}
+
+.app-dark .ql-snow .ql-picker-item:hover,
+.app-dark .ql-snow .ql-picker-item.ql-selected {
+  color: var(--nw-accent) !important;
+}
+
+.app-dark .ql-snow a {
+  color: var(--nw-cyan-300) !important;
+}
+
+.app-dark .ql-snow .ql-tooltip {
+  background: var(--nw-overlay-bg) !important;
+  border-color: var(--p-content-border-color) !important;
+  color: var(--p-text-color) !important;
+  box-shadow: var(--nw-shadow-md) !important;
+}
+
+.app-dark .ql-snow .ql-tooltip input {
+  background: var(--nw-overlay-bg) !important;
+  color: var(--p-text-color) !important;
+  border-color: var(--p-content-border-color) !important;
+}
+
+/* ============================================================
+   NOTE-ITEM ACTIVE STATE
+   ============================================================ */
+
+button.active {
+  background-color: var(--nw-accent-subtle-bg) !important;
+  border-color: var(--nw-accent-subtle-border) !important;
+}
